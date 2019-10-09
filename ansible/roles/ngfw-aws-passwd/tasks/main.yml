@@ -1,0 +1,7 @@
+- name: remote execute sudo passwd
+  expect:
+    command: sudo passwd
+    responses:
+      "Enter password:": "{{ password }}"
+      "Re-enter password:": "{{ password }}"
+  no_log: true

@@ -1,0 +1,42 @@
+---
+#
+# Rollback ena driver on NGFW - NGFW-20029, NGFW-20093
+#
+
+- name: Check if driver is present
+  shell: lsmod | grep ena | awk '{ print $2 }'
+  register: ena_driver_size
+  changed_when: False
+
+- name: Create custom drivers folder
+  file:
+    path=/data/custom-drivers/6.7.0.23007/
+    recurse=yes
+    state=directory
+  # 72447 is the size of the driver    
+  when: ena_driver_size.stdout != "72447"
+
+- name: Copy updated ENA driver
+  copy:
+    src: ena_old.ko
+    dest: /data/custom-drivers/6.7.0.23007/ena.ko
+    checksum: c37f1ef711fc6031fb7aa02ccaf929e61d2bbabb
+  when: ena_driver_size.stdout != "72447"
+
+- name: Reboot firewall
+  shell: /sbin/reboot
+  when: ena_driver_size.stdout != "72447"
+
+- name: Wait for the reboot to complete
+  wait_for_connection:
+    connect_timeout: 5
+    delay: 5
+    sleep: 5
+    timeout: 300
+  when: ena_driver_size.stdout != "72447"
+
+- name: Check if new driver is present after
+  shell: lsmod | grep ena | awk '{ print $2 }'
+  register: ena_driver_size
+  changed_when: False
+  failed_when: ena_driver_size.stdout != "72447"

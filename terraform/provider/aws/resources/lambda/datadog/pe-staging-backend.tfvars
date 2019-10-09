@@ -1,0 +1,5 @@
+bucket               = "s3-use2-s-cops-tfstates"
+dynamodb_table       = "use2-cops-terraform-remote-state"
+region               = "us-east-2"
+key                  = "aws/apps/datadog/datadog-lambda/terraform.tfstate"
+workspace_key_prefix = "regions"

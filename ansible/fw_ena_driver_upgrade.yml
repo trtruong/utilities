@@ -1,0 +1,14 @@
+---
+#
+# Update ENA driver playbook - Upgrade
+#
+
+- hosts: "{{hostgroup}}"
+  remote_user: aws
+  become: yes
+  gather_facts: no
+  become_user: root
+  vars_files:
+    - vars/setpasswd-vars.yml
+  roles:
+  - { role: ena_driver_upgrade }
